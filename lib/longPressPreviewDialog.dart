@@ -1,242 +1,396 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class LongPressPreview extends StatefulWidget {
-  LongPressPreview({Key key, Widget this.child, Widget this.content});
-  Widget content;
-  Widget child;
+class LongPressPreviewFingerMoveCountManager {
+  LongPressPreviewFingerMoveCountManager();
 
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return LongPressPreviewState();
+  // Sum of finger movement on Y axis
+  double _moveCountOnYaxis = 0;
+  // childWidget longPressStart Event's GlobalPosition Y-axis
+  double _fingerOnChildWidgetLongPressStartYaxis = 0;
+
+  double get fingerOnChildWidgetLongPressStartYaxis => _fingerOnChildWidgetLongPressStartYaxis;
+  double get moveCountOnYaxis => _moveCountOnYaxis;
+
+  void moveOnY(double y) {
+    _moveCountOnYaxis += y;
+  }
+
+  void resetYAxisMovementCount() {
+    _moveCountOnYaxis = 0;
+  }
+
+  void setLongPressStartY(double y) {
+    _fingerOnChildWidgetLongPressStartYaxis = y;
   }
 }
 
-class LongPressPreviewState extends State<LongPressPreview> {
-  LongPressPreviewDialog longPressPreviewDialog;
-  OverlayState overlay;
-  bool firstApend = true;
-  OverlayEntry oe;
+class LongPressPreviewDialogPrototypeManager {
+  LongPressPreviewDialogPrototypeManager();
 
-  OverlayEntry _createLongPressPreviewDialog() {
-    if (longPressPreviewDialog == null) {
-      overlay = Overlay.of(context);
-      longPressPreviewDialog = LongPressPreviewDialog(child: widget.content, dispose: _dispose);
-      oe = OverlayEntry(builder: (BuildContext context) {
-        return longPressPreviewDialog;
-      });
-      overlay.insert(oe);
+  // dialog X-axis orientation
+  double _x = 0;
+  // dialog Y-axis orientation
+  double _y = 0;
+
+  // dialog size
+  double _height = 0;
+  double _width = 0;
+
+  // dialog scale
+  double _scale = 1;
+
+  // dialog oMask blur prototype
+  double _maskBlur = 0;
+  double get maskMaxBlur => 10;
+  double get maskMinBlur => 0;
+
+  Offset get position => Offset(_x, _y);
+
+  Size get size => Size(_width, _height);
+  Size get maxSize => const Size(300, 300);
+  double get scale => _scale;
+  double get maskBlur => _maskBlur;
+
+  // Maximum movable y-axis
+  double get yAxisMaxMoveable => 0;
+
+  void xMoveBy(double x) {
+    _x += x;
+  }
+
+  void yMoveBy(double y) {
+    _y += y;
+  }
+
+  void xReset() {
+    _x = 0;
+  }
+
+  void yReset() {
+    _y = 0;
+  }
+
+  void xMoveOn(double x) {
+    _x = x;
+  }
+
+  void yMoveOn(double y) {
+    _y = y;
+  }
+
+  void setSize({double height, double width}) {
+    if (height.runtimeType == double) {
+      _height = height;
+    }
+    if (width.runtimeType == double) {
+      _width = width;
     }
   }
 
-  void _dispose() {
-    firstApend = false;
-    oe.remove();
-    longPressPreviewDialog = null;
+  setPosition(Offset offset) {
+    _x = offset.dx;
+    _y = offset.dy;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Listener(
-        onPointerMove: (PointerMoveEvent event) {
-          if (longPressPreviewDialog != null && firstApend) {
-            longPressPreviewDialog.updateMovePosition(event);
-          }
-        },
-        onPointerUp: (event) => firstApend = false,
-        child: GestureDetector(
-            onLongPress: () {
-              _createLongPressPreviewDialog();
-            },
-            onLongPressEnd: (LongPressEndDetails e) {
-              if (longPressPreviewDialog != null) {
-                longPressPreviewDialog.onLongPressEnd();
-              }
-            },
-            child: widget.child));
+  void zoom(double scale) {
+    print(scale);
+    _scale = scale;
+  }
+
+  void setBlur(double blur) {
+    _maskBlur = blur;
+  }
+}
+
+enum LongPressPreviewAnimationKey { blurAnimation, sizeAnimation, positionAnimation, scaleAnimation, childWidgetTransferDialogWidgetAnimation }
+
+class LongPressPreviewAnimationControllerManager {
+  LongPressPreviewAnimationControllerManager(TickerProvider that, {this.milliseconds, this.parametricCurve, this.screenSize}) {
+    init(that);
+  }
+
+  int milliseconds;
+  Curve parametricCurve;
+  final Size screenSize;
+
+  Animation<double> get curve => _curve;
+  AnimationController get controller => _controller;
+
+  AnimationController _controller;
+  Animation<double> _curve;
+
+  Map<LongPressPreviewAnimationKey, Animation<dynamic>> animations = <LongPressPreviewAnimationKey, Animation<dynamic>>{};
+
+  void init(TickerProvider that) {
+    _controller = AnimationController(vsync: that, duration: Duration(milliseconds: milliseconds));
+    _curve = CurvedAnimation(parent: _controller, curve: parametricCurve);
+  }
+
+  Animation<double> buildCurve(Curve curve) {
+    return CurvedAnimation(parent: _controller, curve: curve);
+  }
+
+  void forward() {
+    if (_controller?.isCompleted ?? false) _controller.reset();
+    _controller.forward();
+  }
+
+  Future<void> reverse() async {
+    await _controller.reverse();
+  }
+
+  void dispose() {
+    _controller.dispose();
+  }
+
+  void setAnimation(LongPressPreviewAnimationKey key,
+      {dynamic begin, dynamic end, Function callBack, Animation<double> otherCurve, Offset pixelsPerSecond}) async {
+    animations[key] = Tween<dynamic>(begin: begin, end: end).animate(otherCurve ?? curve)
+      ..addListener(() {
+        callBack(animations[key].value);
+      });
   }
 }
 
 class LongPressPreviewDialog extends StatefulWidget {
-  LongPressPreviewDialog({Key key, this.elevation, this.child, this.longPressStartDetails, this.dispose}) : super(key: key);
+  LongPressPreviewDialog(
+      {Key key,
+      this.elevation,
+      this.child,
+      this.screenSize,
+      this.longPressStartDetails,
+      this.content,
+      this.dispose,
+      this.childWidgetSize,
+      this.childWidgetPosition})
+      : super(key: key);
 
-  /// If null then [DialogTheme.elevation] is used, and if that's null then the
-  /// dialog's elevation is 24.0.
-  /// {@endtemplate}
-  /// {@macro flutter.material.material.elevation}
   final double elevation;
 
-  /// The widget below this widget in the tree.
-  ///
-  /// {@macro flutter.widgets.child}
   final Widget child;
+  final Widget content;
+
+  final Size screenSize;
 
   LongPressPreviewDialogState state;
 
+  // 暂存首次长按的信息
   LongPressStartDetails longPressStartDetails;
+
+  Size childWidgetSize;
+  Offset childWidgetPosition;
 
   Function dispose;
 
   void updateMovePosition(PointerMoveEvent event) {
+    state ??= LongPressPreviewDialogState();
     state.onDragUpdate(event.delta);
   }
 
-  void onLongPressEnd() {
-    state.onDragEnd();
+  void onLongPressEnd(Velocity velocity) {
+    state.onDragEnd(velocity);
   }
 
   @override
   State<StatefulWidget> createState() {
-    return state = LongPressPreviewDialogState();
+    state ??= LongPressPreviewDialogState();
+    return state;
   }
 }
 
-class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with SingleTickerProviderStateMixin {
-  static const double _defaultElevation = 24.0;
-  static const RoundedRectangleBorder _defaultDialogShape = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4.0)));
-  // dialog axis Y move
-  double _moveY = 0.0;
-  double _moveX = 0.0;
+class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with TickerProviderStateMixin {
+  bool dialogTransferFlug = false;
 
-  Animation<double> moveYAnimation;
-  Animation<double> moveXAnimation;
+  double screenHeight;
+  double screenWidth;
 
-  Animation<double> resetXAnimation;
-  Animation<double> resetYAnimation;
-  Animation<double> scaleAnimation;
+  int outInAnimationDuration = 200;
 
-  Animation<double> curve;
+  Animation<double> childWidgetMoveXDialogAnimation;
+  Animation<double> childWidgetMoveYDialogAnimation;
 
-  double _negativeCount = 0;
+  LongPressPreviewFingerMoveCountManager fingerMoveCountManager = LongPressPreviewFingerMoveCountManager();
+  LongPressPreviewDialogPrototypeManager dialogPrototypeManager = LongPressPreviewDialogPrototypeManager();
 
-  double _scale = 1;
+  LongPressPreviewAnimationControllerManager outInAnimationControllerManager;
+  LongPressPreviewAnimationControllerManager resetPositionAnimationControllerManager;
 
-  AnimationController animationController;
+  bool get hasOverflowCloseThreshold =>
+      dialogPrototypeManager.position.dy > 120 ||
+      ((dialogPrototypeManager.position.dy + fingerMoveCountManager.fingerOnChildWidgetLongPressStartYaxis) >= (screenHeight - 20));
 
   void onDragStart(DragDownDetails details) {
-    print(details);
-  }
-
-  void onLongPressMoveUpdate(e) {
-    print('onLongPressMoveUpdate$e');
+    fingerMoveCountManager.setLongPressStartY(details.globalPosition.dy);
   }
 
   void onDragUpdate(Offset delta) {
-    if (_moveY + delta.dy >= 0 && _negativeCount >= 0) {
-      setState(() {
-        _moveY += delta.dy;
-      });
+    if (outInAnimationControllerManager?.controller?.isAnimating ?? false) return;
+    if (dialogPrototypeManager.position.dy + delta.dy >= 0 && fingerMoveCountManager.moveCountOnYaxis >= 0) {
+      dialogPrototypeManager.yMoveBy(delta.dy);
     } else {
-      setState(() {
-        _moveY = 0;
-      });
+      double scale = -fingerMoveCountManager.moveCountOnYaxis / (screenHeight / 8);
+      dialogPrototypeManager.yMoveBy(delta.dy * (max(1 - scale, 0.05)));
     }
     setState(() {
-      _moveX += delta.dx / 4;
+      dialogPrototypeManager.xMoveBy(delta.dx / 4);
     });
-    _negativeCount += delta.dy;
-    print('_negative_count  $_negativeCount');
+    fingerMoveCountManager.moveOnY(delta.dy);
     computedScale();
   }
 
-  void onDragEnd() {
-    if (_moveY > 300) return widget.dispose();
-    resetXAnimation = Tween<double>(begin: _moveX, end: 0).animate(curve)
-      ..addListener(() {
-        setState(() {
-          _moveX = resetXAnimation.value;
-        });
-      });
-    resetYAnimation = Tween<double>(begin: _moveY, end: 0).animate(curve)
-      ..addListener(() {
-        setState(() {
-          _moveY = resetYAnimation.value;
-        });
-      });
-    scaleAnimation = Tween<double>(begin: _scale, end: 1).animate(curve)
-      ..addListener(() {
-        setState(() {
-          _scale = scaleAnimation.value;
-        });
-      });
-    if (animationController?.isCompleted) {
-      animationController.reset();
-    }
-    animationController.forward();
-    _negativeCount = 0;
+  Future<void> onDispose() async {
+    setState(() {
+      dialogTransferFlug = !dialogTransferFlug;
+    });
+    setChildWidgetMoveDialogAnimation(reverse: true);
+    await outInAnimationControllerManager.reverse();
+    fingerMoveCountManager.setLongPressStartY(0);
+    widget.dispose();
   }
 
-  computedScale() {
-    double _ = _negativeCount / MediaQuery.of(context).size.height;
-    if (_negativeCount > 0) {
-      _scale = 1 - (_ / 2);
+  // dialog move back origin Offset(0, 0)
+  // resume scale 1
+  void resetAnimation(Velocity velocity) {
+    // reset dialog position to origin point animation
+    resetPositionAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.positionAnimation,
+        begin: dialogPrototypeManager.position,
+        end: const Offset(0, 0),
+        pixelsPerSecond: velocity.pixelsPerSecond,
+        callBack: (Offset value) => setState(() {
+              dialogPrototypeManager.setPosition(value);
+            }));
+    // reset dialog scale to 1 animation
+    resetPositionAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.scaleAnimation,
+        begin: dialogPrototypeManager.scale * 100,
+        end: (1.0 * 100),
+        callBack: (double value) => setState(() {
+              dialogPrototypeManager.zoom(value / 100);
+            }));
+
+    resetPositionAnimationControllerManager.forward();
+  }
+
+  // fingers off screen
+  Future<void> onDragEnd(Velocity velocity) async {
+    print(velocity);
+    if (hasOverflowCloseThreshold) return onDispose();
+    resetAnimation(velocity);
+    fingerMoveCountManager.resetYAxisMovementCount();
+  }
+
+  void computedScale() {
+    final double _ = fingerMoveCountManager.moveCountOnYaxis / MediaQuery.of(context).size.height;
+    if (fingerMoveCountManager.moveCountOnYaxis > 0) {
+      dialogPrototypeManager.zoom(1 - (_ / 2));
     } else {
-      _scale = 1 + (_ / 3);
+      dialogPrototypeManager.zoom(1 + (_ / 3));
     }
+  }
+
+  void setChildWidgetMoveDialogAnimation({bool reverse = false}) {
+    Offset beginOffset = Offset(widget.childWidgetPosition.dx - screenWidth / 2 + widget.childWidgetSize.width / 2,
+        widget.childWidgetPosition.dy - screenHeight / 2 + widget.childWidgetSize.height / 2);
+    // childWidget transfer dialog animation need more beautiful curves 😊
+    final Animation<double> childWidgetTransferDialogAnimationCurve = outInAnimationControllerManager.buildCurve(Curves.easeOutBack);
+    Offset endOffset = reverse ? Offset(dialogPrototypeManager.position.dx, dialogPrototypeManager.position.dy) : const Offset(0, 0);
+    outInAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.childWidgetTransferDialogWidgetAnimation,
+        begin: beginOffset,
+        end: endOffset,
+        otherCurve: childWidgetTransferDialogAnimationCurve,
+        callBack: (Offset value) => setState(() {
+              dialogPrototypeManager.setPosition(value);
+            }));
+    if (reverse) {
+      outInAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.scaleAnimation,
+          begin: 100.0,
+          end: dialogPrototypeManager.scale * 100,
+          callBack: (double value) => setState(() {
+                dialogPrototypeManager.zoom(value / 100);
+              }));
+    }
+  }
+
+  void dialogInScreenAnimation() {
+    setChildWidgetMoveDialogAnimation();
+    outInAnimationControllerManager.forward();
+    setState(() {
+      dialogTransferFlug = !dialogTransferFlug;
+    });
+  }
+
+  // dialog OutIn animation
+  void initOutInAnimation() {
+    const int outInAnimationDuration = 200;
+    outInAnimationControllerManager =
+        LongPressPreviewAnimationControllerManager(this, milliseconds: outInAnimationDuration, parametricCurve: Curves.easeIn, screenSize: widget.screenSize);
+    // set mask blur animation
+    outInAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.blurAnimation,
+        begin: dialogPrototypeManager.maskBlur,
+        end: dialogPrototypeManager.maskMaxBlur,
+        callBack: (double value) => setState(() {
+              dialogPrototypeManager.setBlur(value);
+            }));
+    outInAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.sizeAnimation,
+        begin: Size(widget.childWidgetSize.width, widget.childWidgetSize.height),
+        end: dialogPrototypeManager.maxSize,
+        callBack: (Size size) => setState(() {
+              dialogPrototypeManager.setSize(height: size.height, width: size.width);
+            }));
+  }
+
+  void initResetDialogPositionAnimation() {
+    const int resetOffsetAnimationDuration = 200;
+    resetPositionAnimationControllerManager = LongPressPreviewAnimationControllerManager(this,
+        milliseconds: resetOffsetAnimationDuration, parametricCurve: Curves.easeIn, screenSize: widget.screenSize);
   }
 
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    curve = CurvedAnimation(parent: animationController, curve: Curves.easeOut);
+    initOutInAnimation();
+    initResetDialogPositionAnimation();
+    fingerMoveCountManager.setLongPressStartY(widget.longPressStartDetails.globalPosition.dy);
+    WidgetsBinding.instance.addPostFrameCallback((Duration callback) {
+      dialogInScreenAnimation();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final DialogTheme dialogTheme = DialogTheme.of(context);
+    final Size screenSize = MediaQuery.of(context).size;
+    screenHeight = screenSize.height;
+    screenWidth = screenSize.width;
     return Listener(
-        onPointerMove: (PointerMoveEvent e) {
-          print('123213321');
-        },
         child: GestureDetector(
-            onTap: () => widget.dispose(),
+            onTap: () => onDispose(),
             behavior: HitTestBehavior.translucent,
             onPanDown: (DragDownDetails details) => onDragStart(details),
             onPanUpdate: (DragUpdateDetails details) => onDragUpdate(details.delta),
-            onPanEnd: (DragEndDetails details) => onDragEnd(),
+            onPanEnd: (DragEndDetails details) => onDragEnd(details.velocity),
             child: ClipRect(
                 child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    filter: ImageFilter.blur(sigmaX: dialogPrototypeManager.maskBlur, sigmaY: dialogPrototypeManager.maskBlur),
                     child: Container(
-                        color: Colors.white.withOpacity(0),
+                        color: Colors.transparent,
                         child: Center(
                             child: GestureDetector(
-                                onTap: () => print('qwdqwdqw'),
                                 child: ConstrainedBox(
-                                    constraints: const BoxConstraints(minWidth: 280.0),
-                                    child: Material(
-                                        elevation: widget.elevation ?? dialogTheme.elevation ?? _defaultElevation,
-                                        shape: _defaultDialogShape,
-                                        child: Transform.translate(
-                                            offset: Offset(_moveX, _moveY),
-                                            child: Transform.scale(
-                                                scale: _scale,
-                                                child: Container(height: 200, width: 200, child: Text(_moveX.toString()), color: Colors.white))))))))))));
+                                    constraints: BoxConstraints(maxWidth: dialogPrototypeManager.size.width, maxHeight: dialogPrototypeManager.size.height),
+                                    child: Transform.translate(
+                                        offset: dialogPrototypeManager.position,
+                                        child: Transform.scale(
+                                            scale: dialogPrototypeManager.scale,
+                                            child: AnimatedSwitcher(
+                                                transitionBuilder: (Widget child, Animation<double> animation) {
+                                                  return FadeTransition(opacity: animation, child: child);
+                                                },
+                                                duration: Duration(milliseconds: outInAnimationDuration),
+                                                child: dialogTransferFlug
+                                                    ? Container(key: ValueKey<bool>(dialogTransferFlug), child: widget.content)
+                                                    : Container(key: ValueKey<bool>(dialogTransferFlug), child: widget.child))))))))))));
   }
 }
-
-// LongPressPreviewDialog showLongPressPreviewDialog<T>({@required BuildContext context, Widget content}) {
-//   LongPressPreviewDialog longPressPreviewDialog = LongPressPreviewDialog(
-//     child: content,
-//   );
-//   showGeneralDialog(
-//     barrierDismissible: true,
-//     barrierLabel: '',
-//     barrierColor: Colors.black38,
-//     transitionDuration: Duration(milliseconds: 200),
-//     pageBuilder: (ctx, anim1, anim2) => longPressPreviewDialog,
-//     transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-//       filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
-//       child: FadeTransition(
-//         child: child,
-//         opacity: anim1,
-//       ),
-//     ),
-//     context: context,
-//   );
-//   return longPressPreviewDialog;
-// }
