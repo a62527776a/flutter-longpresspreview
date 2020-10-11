@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'long_press_preview_dialog.dart';
 
 class LongPressPreview extends StatefulWidget {
-  LongPressPreview({Key key, this.child, this.content, this.onContentTap, this.onCreateDialog, this.dialogSize = const Size(300, 300)}) : super(key: key);
+  LongPressPreview({Key key, this.child, this.onDragToTop, this.content, this.onContentTap, this.onCreateDialog, this.dialogSize = const Size(300, 300)})
+      : super(key: key);
   Widget content;
   Widget child;
   Function onContentTap;
   Function onCreateDialog;
+  Function onDragToTop;
 
   final Size dialogSize;
 
@@ -38,6 +40,7 @@ class LongPressPreviewState extends State<LongPressPreview> {
             screenSize: screenSize,
             dispose: _dispose,
             longPressStartDetails: e,
+            onDragToTop: widget.onDragToTop,
             content: widget.content,
             dialogSize: widget.dialogSize,
             onContentTap: widget.onContentTap,

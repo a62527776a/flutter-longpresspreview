@@ -163,6 +163,7 @@ class LongPressPreviewDialog extends StatefulWidget {
       this.child,
       this.screenSize,
       this.longPressStartDetails,
+      this.onDragToTop,
       this.content,
       this.dialogSize,
       this.dispose,
@@ -176,6 +177,7 @@ class LongPressPreviewDialog extends StatefulWidget {
   final Widget child;
   final Widget content;
   final Function onContentTap;
+  final Function onDragToTop;
   final Size dialogSize;
 
   final Size screenSize;
@@ -236,8 +238,14 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
     if (dialogPrototypeManager.position.dy + delta.dy >= 0 && fingerMoveCountManager.moveCountOnYaxis >= 0) {
       dialogPrototypeManager.yMoveBy(delta.dy);
     } else {
-      double scale = -fingerMoveCountManager.moveCountOnYaxis / (screenHeight / 8);
-      dialogPrototypeManager.yMoveBy(delta.dy * (max(1 - scale, 0.05)));
+      double scale = -fingerMoveCountManager.moveCountOnYaxis / (screenHeight / 6);
+      if (1 - scale < 0.05 && widget.onDragToTop != null) {
+        widget.onDragToTop();
+        onDispose(now: true);
+      } else {
+        double moveYOffset = delta.dy * (max(1 - scale, 0.05));
+        dialogPrototypeManager.yMoveBy(moveYOffset);
+      }
     }
     setState(() {
       dialogPrototypeManager.xMoveBy(delta.dx / 4);

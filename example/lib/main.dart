@@ -82,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: LongPressPreview(
                     onCreateDialog: () => onCreateDialog(),
                     dialogSize: const Size(300, 300),
+                    onDragToTop: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen())),
                     onContentTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen())),
                     child: MediaCardVertical(imageUrl: 'assets/example.jpg', title: 'BiliBili 干杯🍻', scope: 3),
                     content: Card(
