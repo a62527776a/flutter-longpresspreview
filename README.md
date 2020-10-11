@@ -1,14 +1,12 @@
-# longPressPreview
+# flutter longPressPreview
 
-A new Flutter package project.
+用于任意组件长按并展示可拖动弹窗
+Long press and show draggable dialog of any widget.
 
-## Getting Started
+可拖动弹窗以及多手势回调
+Draggable dialog and multi gesture callback provides.
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+上拉推入或者下拉关闭弹窗
+Drag up push or Drag down close dialog.
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## preview
