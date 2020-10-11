@@ -29,7 +29,7 @@ class LongPressPreviewFingerMoveCountManager {
 }
 
 class LongPressPreviewDialogPrototypeManager {
-  LongPressPreviewDialogPrototypeManager();
+  LongPressPreviewDialogPrototypeManager({this.maxSize});
 
   // dialog X-axis orientation
   double _x = 0;
@@ -39,6 +39,7 @@ class LongPressPreviewDialogPrototypeManager {
   // dialog size
   double _height = 0;
   double _width = 0;
+  Size maxSize;
 
   // dialog scale
   double _scale = 1;
@@ -51,7 +52,6 @@ class LongPressPreviewDialogPrototypeManager {
   Offset get position => Offset(_x, _y);
 
   Size get size => Size(_width, _height);
-  Size get maxSize => const Size(300, 300);
   double get scale => _scale;
   double get maskBlur => _maskBlur;
 
@@ -164,8 +164,10 @@ class LongPressPreviewDialog extends StatefulWidget {
       this.screenSize,
       this.longPressStartDetails,
       this.content,
+      this.dialogSize,
       this.dispose,
       this.childWidgetSize,
+      this.onContentTap,
       this.childWidgetPosition})
       : super(key: key);
 
@@ -173,6 +175,8 @@ class LongPressPreviewDialog extends StatefulWidget {
 
   final Widget child;
   final Widget content;
+  final Function onContentTap;
+  final Size dialogSize;
 
   final Size screenSize;
 
@@ -214,7 +218,7 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
   Animation<double> childWidgetMoveYDialogAnimation;
 
   LongPressPreviewFingerMoveCountManager fingerMoveCountManager = LongPressPreviewFingerMoveCountManager();
-  LongPressPreviewDialogPrototypeManager dialogPrototypeManager = LongPressPreviewDialogPrototypeManager();
+  LongPressPreviewDialogPrototypeManager dialogPrototypeManager;
 
   LongPressPreviewAnimationControllerManager outInAnimationControllerManager;
   LongPressPreviewAnimationControllerManager resetPositionAnimationControllerManager;
@@ -242,13 +246,15 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
     computedScale();
   }
 
-  Future<void> onDispose() async {
-    setState(() {
-      dialogTransferFlug = !dialogTransferFlug;
-    });
-    setChildWidgetMoveDialogAnimation(reverse: true);
-    await outInAnimationControllerManager.reverse();
-    fingerMoveCountManager.setLongPressStartY(0);
+  Future<void> onDispose({bool now = false}) async {
+    if (!now) {
+      setState(() {
+        dialogTransferFlug = !dialogTransferFlug;
+      });
+      setChildWidgetMoveDialogAnimation(reverse: true);
+      await outInAnimationControllerManager.reverse();
+      fingerMoveCountManager.setLongPressStartY(0);
+    }
     widget.dispose();
   }
 
@@ -348,9 +354,16 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
         milliseconds: resetOffsetAnimationDuration, parametricCurve: Curves.easeIn, screenSize: widget.screenSize);
   }
 
+  // handle event on tap content after
+  void onContentTap() {
+    onDispose(now: true);
+    widget.onContentTap();
+  }
+
   @override
   void initState() {
     super.initState();
+    dialogPrototypeManager = LongPressPreviewDialogPrototypeManager(maxSize: widget.dialogSize);
     initOutInAnimation();
     initResetDialogPositionAnimation();
     fingerMoveCountManager.setLongPressStartY(widget.longPressStartDetails.globalPosition.dy);
@@ -390,7 +403,12 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
                                                 },
                                                 duration: Duration(milliseconds: outInAnimationDuration),
                                                 child: dialogTransferFlug
-                                                    ? Container(key: ValueKey<bool>(dialogTransferFlug), child: widget.content)
+                                                    ? Container(
+                                                        key: ValueKey<bool>(dialogTransferFlug),
+                                                        child: GestureDetector(
+                                                          child: widget.content,
+                                                          onTap: () => onContentTap(),
+                                                        ))
                                                     : Container(key: ValueKey<bool>(dialogTransferFlug), child: widget.child))))))))))));
   }
 }

@@ -26,18 +26,8 @@ class MediaCardVertical extends MediaCard {
               aspectRatio: 113.0 / 158.0,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
-                child: Image.network(imageUrl),
+                child: Image.asset(imageUrl),
               )),
-          Positioned(
-              bottom: -1,
-              child: scope != 0
-                  ? Container(
-                      height: 50,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: [Color(0xAA0F0F0F), Color.fromRGBO(0x00, 0x00, 0x00, 0x00)])))
-                  : Container()),
           Positioned(
             bottom: 4,
             right: 6,
