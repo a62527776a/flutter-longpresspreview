@@ -11,5 +11,8 @@ Drag up push or Drag down close dialog.
 
 ## web demo preview
 
+https://a62527776a.github.io/flutter-longpress-preview-demo/index.html
 
 ## preview
+
+![ezgif-6-a56436a2339f.gif](https://upload-images.jianshu.io/upload_images/5738345-2ec8aba65f9ba445.gif?imageMogr2/auto-orient/strip)
