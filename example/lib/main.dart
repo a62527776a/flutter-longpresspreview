@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:long_press_preview/index.dart';
+import 'package:long_press_preview/long_press_preview.dart';
 
 import './card.dart';
 

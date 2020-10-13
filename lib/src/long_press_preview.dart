@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'long_press_preview_dialog.dart';
+import 'package:long_press_preview/src/long_press_preview_dialog.dart';
 
 class LongPressPreview extends StatefulWidget {
   LongPressPreview({Key key, this.child, this.onDragToTop, this.content, this.onContentTap, this.onCreateDialog, this.dialogSize = const Size(300, 300)})
