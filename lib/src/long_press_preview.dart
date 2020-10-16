@@ -12,6 +12,7 @@ class LongPressPreview extends StatefulWidget {
   Function onContentTap;
   Function onCreateDialog;
   Function onDragToTop;
+  Function(LongPressPreviewFingerEvent) fingerEvent;
 
   final Size dialogSize;
 

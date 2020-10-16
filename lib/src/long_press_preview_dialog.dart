@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+enum LongPressPreviewFingerEvent { long_press_start, long_press_end, long_press_cancel, long_press_drag_top }
+
 class LongPressPreviewFingerMoveCountManager {
   LongPressPreviewFingerMoveCountManager();
 
