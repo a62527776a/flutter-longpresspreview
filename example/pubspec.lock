@@ -75,9 +75,9 @@ packages:
   long_press_preview:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      name: long_press_preview
+      url: "https://pub.flutter-io.cn"
+    source: hosted
     version: "0.0.1"
   matcher:
     dependency: transitive

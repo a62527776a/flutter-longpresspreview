@@ -1,4 +1,9 @@
+![ezgif-6-a56436a2339f.gif](https://upload-images.jianshu.io/upload_images/5738345-2ec8aba65f9ba445.gif?imageMogr2/auto-orient/strip)
+
 # flutter longPressPreview
+
+[![pub package](https://img.shields.io/pub/v/long_press_preview.svg)](https://pub.dartlang.org/packages/long_press_preview)
+
 
 用于任意组件长按并展示可拖动弹窗  
 Long press and show draggable dialog of any widget.
@@ -13,9 +18,15 @@ Drag up or Drag down close dialog.
 
 https://a62527776a.github.io/flutter-longpress-preview-demo/index.html
 
-## preview
+## install
+add next line to pubspec.yaml
+``` yaml
+long_press_preview: ^0.0.1
+```
 
-![ezgif-6-a56436a2339f.gif](https://upload-images.jianshu.io/upload_images/5738345-2ec8aba65f9ba445.gif?imageMogr2/auto-orient/strip)
+``` cmd
+$ flutter pub get
+```
 
 ## How to use
 
@@ -64,3 +75,31 @@ void onFingerCallBack(LongPressPreviewFingerEvent event, Function dispose) {
 }
 
 ```
+
+
+## Quick reference
+Property | What does it do(cn) | What does it do(en)
+----------------   |---------------- | ---------------
+child              | 长按这个组件将弹窗口 | Long press on this widget will pop up dialog
+content            | 弹窗展示的内容 | display to user by content 
+onFingerCallBack   | 手势的回调 | gesture callback
+dialogSize         | 弹窗的大小(可选 default 300x300) | dialog size (optional default 300x300)
+
+## onFingerCallBack params
+``` dart
+onFingerCallBack(LongPressPreviewFingerEvent event, Function dispose)
+```
+onFingerCallBack拥有两个参数 第一个参数类型是LongPressPreviewFingerEvent 这是一个枚举值 拥有long_press_start, long_press_end, long_press_cancel, long_press_drag_top四个值。  
+onFingerCallBack has tow param. One is  LongPressPreviewFingerEvent. This is an enumeration with four types. long_press_start, long_press_end, long_press_cancel, long_press_drag_top
+
+enum LongPressPreviewFingerEvent
+Property | What does it do(cn) | What does it do(en)
+----------------   |---------------- | ---------------
+long_press_start | 创建弹窗时回调 | Callback when create dialog
+long_press_end | 松开手指时回调 | Callback when release your finger
+long_press_cancel | 滑到下方时回调 | Callback when slider to bottom 
+long_press_drag_top | 滑到上方时回调 | Callback when slider to top
+
+第二个参数是一个函数，当第一个参数的类型为LongPressPreviewFingerEven.long_press_drag_top or LongPressPreviewFingerEven.long_press_end，调用第二个参数将卸载弹窗的实例。否则将什么也不会发生。这用于您希望在拖动到上方或者长按结束时卸载弹窗并且做其他事情（比如说跳转到下一个页面)  
+the second param is a function. when first params is LongPressPreviewFingerEven.long_press_drag_top or LongPressPreviewFingerEven.long_press_end, call the second param will uninstall dialog instance. Otherwise nothing will happen.This is used if you want to unload the pop-up window and do something else (such as jump to the next page) when you drag above or at the end of a long press
+
