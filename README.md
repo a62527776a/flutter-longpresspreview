@@ -6,7 +6,7 @@ Long press and show draggable dialog of any widget.
 可拖动弹窗以及多手势回调  
 Draggable dialog and multi gesture callback provides.
 
-上拉或者松开关闭弹窗
+上拉或者松开关闭弹窗  
 Drag up or Drag down close dialog.
 
 ## web demo preview
@@ -22,7 +22,7 @@ https://a62527776a.github.io/flutter-longpress-preview-demo/index.html
 ``` Dart
 import 'package:long_press_preview/long_press_preview.dart';
 ```
-包裹你的子组件并且构建你的弹窗样式
+包裹你的子组件并且构建你的弹窗样式  
 Wrap your child widget and build your dialog widget
 ``` Dart
 LongPressPreview(
@@ -33,7 +33,7 @@ LongPressPreview(
 )
 ```
 
-onFingerCallBack 将会回调手势事件以及卸载实例的函数
+onFingerCallBack 将会回调手势事件以及卸载实例的函数  
 onFingerCallBack Will callback gesture events and uninstall the instance
 ``` Dart
 // This is when the fingers are released uninstall dialog and navigator to next page example
