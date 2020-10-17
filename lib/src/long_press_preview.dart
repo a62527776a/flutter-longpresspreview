@@ -5,14 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:long_press_preview/src/long_press_preview_dialog.dart';
 
 class LongPressPreview extends StatefulWidget {
-  LongPressPreview({Key key, this.child, this.onDragToTop, this.content, this.onContentTap, this.onCreateDialog, this.dialogSize = const Size(300, 300)})
+  LongPressPreview(
+      {Key key,
+      this.child,
+      this.onDragToTop,
+      this.content,
+      this.onContentTap,
+      this.onFingerCallBack,
+      this.onCreateDialog,
+      this.dialogSize = const Size(300, 300)})
       : super(key: key);
   Widget content;
   Widget child;
   Function onContentTap;
   Function onCreateDialog;
   Function onDragToTop;
-  Function(LongPressPreviewFingerEvent) fingerEvent;
+  Function(LongPressPreviewFingerEvent, Function) onFingerCallBack;
 
   final Size dialogSize;
 
@@ -31,7 +39,7 @@ class LongPressPreviewState extends State<LongPressPreview> {
 
   // 创建一个弹窗
   void _createLongPressPreviewDialog(LongPressStartDetails e, BuildContext context) {
-    if (widget.onCreateDialog != null) widget.onCreateDialog();
+    if (widget.onFingerCallBack != null) widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_start, () => {});
     final Size screenSize = MediaQuery.of(context).size;
     final RenderBox childWidgetContext = context.findRenderObject() as RenderBox;
     if (longPressPreviewDialog == null) {
@@ -41,10 +49,9 @@ class LongPressPreviewState extends State<LongPressPreview> {
             screenSize: screenSize,
             dispose: _dispose,
             longPressStartDetails: e,
-            onDragToTop: widget.onDragToTop,
             content: widget.content,
+            onFingerCallBack: widget.onFingerCallBack,
             dialogSize: widget.dialogSize,
-            onContentTap: widget.onContentTap,
             childWidgetSize: childWidgetContext.size,
             childWidgetPosition: childWidgetContext.localToGlobal(Offset.zero),
             child: widget.child);

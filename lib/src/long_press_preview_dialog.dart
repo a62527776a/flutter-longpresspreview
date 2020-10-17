@@ -99,7 +99,6 @@ class LongPressPreviewDialogPrototypeManager {
   }
 
   void zoom(double scale) {
-    print(scale);
     _scale = scale;
   }
 
@@ -168,6 +167,7 @@ class LongPressPreviewDialog extends StatefulWidget {
       this.onDragToTop,
       this.content,
       this.dialogSize,
+      this.onFingerCallBack,
       this.dispose,
       this.childWidgetSize,
       this.onContentTap,
@@ -180,6 +180,7 @@ class LongPressPreviewDialog extends StatefulWidget {
   final Widget content;
   final Function onContentTap;
   final Function onDragToTop;
+  final Function onFingerCallBack;
   final Size dialogSize;
 
   final Size screenSize;
@@ -241,9 +242,8 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
       dialogPrototypeManager.yMoveBy(delta.dy);
     } else {
       double scale = -fingerMoveCountManager.moveCountOnYaxis / (screenHeight / 6);
-      if (1 - scale < 0.05 && widget.onDragToTop != null) {
-        widget.onDragToTop();
-        onDispose(now: true);
+      if (1 - scale < 0.05) {
+        callBackFingerEventTop();
       } else {
         double moveYOffset = delta.dy * (max(1 - scale, 0.05));
         dialogPrototypeManager.yMoveBy(moveYOffset);
@@ -293,9 +293,17 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
   // fingers off screen
   Future<void> onDragEnd(Velocity velocity) async {
     print(velocity);
-    if (hasOverflowCloseThreshold) return onDispose();
+    if (hasOverflowCloseThreshold) {
+      if (widget.onFingerCallBack != null) widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_cancel, () {});
+      return onDispose();
+    }
     resetAnimation(velocity);
     fingerMoveCountManager.resetYAxisMovementCount();
+    if (widget.onFingerCallBack != null) {
+      widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_end, () {
+        widget.dispose();
+      });
+    }
   }
 
   void computedScale() {
@@ -328,6 +336,13 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
                 dialogPrototypeManager.zoom(value / 100);
               }));
     }
+  }
+
+  void callBackFingerEventTop() {
+    if (widget.onFingerCallBack != null)
+      widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_drag_top, () {
+        onDispose(now: true);
+      });
   }
 
   void dialogInScreenAnimation() {
@@ -366,8 +381,10 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
 
   // handle event on tap content after
   void onContentTap() {
-    onDispose(now: true);
-    widget.onContentTap();
+    if (widget.onFingerCallBack != null)
+      widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_end, () {
+        onDispose(now: true);
+      });
   }
 
   @override
