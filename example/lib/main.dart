@@ -67,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       // finger leave screen callback
       case LongPressPreviewFingerEvent.long_press_end:
+        dispose();
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen()));
         break;
       // finger drag to bottom and override threshold
       case LongPressPreviewFingerEvent.long_press_cancel:

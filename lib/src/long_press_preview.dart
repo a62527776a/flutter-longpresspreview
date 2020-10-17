@@ -65,6 +65,7 @@ class LongPressPreviewState extends State<LongPressPreview> {
 
   // 状态重制并销毁
   void _dispose() {
+    if (longPressPreviewDialog == null) return;
     oe.remove();
     setState(() {
       longPressPreviewDialog = null;
