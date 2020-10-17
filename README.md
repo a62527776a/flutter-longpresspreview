@@ -1,4 +1,4 @@
-# flutter longPressPreview
+# long_press_preview
 
 [![pub package](https://img.shields.io/pub/v/long_press_preview.svg)](https://pub.dartlang.org/packages/long_press_preview)
 
