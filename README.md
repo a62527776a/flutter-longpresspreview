@@ -1,9 +1,8 @@
-![ezgif-6-a56436a2339f.gif](https://upload-images.jianshu.io/upload_images/5738345-2ec8aba65f9ba445.gif?imageMogr2/auto-orient/strip)
-
 # flutter longPressPreview
 
 [![pub package](https://img.shields.io/pub/v/long_press_preview.svg)](https://pub.dartlang.org/packages/long_press_preview)
 
+![ezgif-6-a56436a2339f.gif](https://i.loli.net/2020/10/17/jPXslJnTD2GewIk.gif)
 
 用于任意组件长按并展示可拖动弹窗  
 Long press and show draggable dialog of any widget.
