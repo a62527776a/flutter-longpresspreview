@@ -1,5 +1,6 @@
 name: long_press_preview
-description: A new Flutter package project.
+description: Long press and show draggable dialog of any widget. Draggable dialog and multi gesture callback provides. Drag up or Drag down close dialog.
+
 homepage: https://github.com/a62527776a
 version: 0.0.1
 
