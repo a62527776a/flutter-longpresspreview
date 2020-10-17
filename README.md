@@ -28,6 +28,7 @@ Wrap your child widget and build your dialog widget
 LongPressPreview(
     child: Container(height: 30, width: 30, color: red),
     content: Container(height: 300, width: 300, child: Text('这是一个String')),
+    // dialogSize: Size(300, 300), // Optional
     onFingerCallBack: onFingerCallBack,
     dialogSize: dialogSize
 )
