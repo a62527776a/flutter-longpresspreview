@@ -64,11 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       // finger drag to top callback event
       case LongPressPreviewFingerEvent.long_press_drag_top:
+        dispose();
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen()));
         break;
       // finger leave screen callback
       case LongPressPreviewFingerEvent.long_press_end:
-        dispose();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen()));
         break;
       // finger drag to bottom and override threshold
       case LongPressPreviewFingerEvent.long_press_cancel:
@@ -100,44 +100,46 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: 24,
             itemBuilder: (BuildContext context, int idx) {
               return Container(
-                  child: LongPressPreview(
-                      onFingerCallBack: onFingerCallBack,
-                      dialogSize: const Size(300, 300),
-                      child: MediaCardVertical(imageUrl: 'assets/example.jpg', title: 'BiliBili 干杯🍻', scope: 3),
-                      content: Card(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: <Widget>[
-                            AspectRatio(
-                                aspectRatio: 158 / 90,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  child: Image.asset('assets/unnamed1.jpg'),
-                                )),
-                            SizedBox(height: 16),
-                            const ListTile(
-                              leading: Icon(Icons.album),
-                              title: Text('The Enchanted Nightingale'),
-                              subtitle: Text('Music by Julie Gable. Lyrics by Sidney Stein.'),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                TextButton(
-                                  child: const Text('BUY TICKETS'),
-                                  onPressed: () {/* ... */},
-                                ),
-                                const SizedBox(width: 8),
-                                TextButton(
-                                  child: const Text('LISTEN'),
-                                  onPressed: () {/* ... */},
-                                ),
-                                const SizedBox(width: 8),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )));
+                child: LongPressPreview(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SecondScreen())),
+                    onFingerCallBack: onFingerCallBack,
+                    dialogSize: const Size(300, 500),
+                    child: MediaCardVertical(imageUrl: 'assets/example.jpg', title: 'BiliBili 干杯🍻', scope: 3),
+                    content: Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          AspectRatio(
+                              aspectRatio: 158 / 90,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(6),
+                                child: Image.asset('assets/unnamed1.jpg'),
+                              )),
+                          SizedBox(height: 16),
+                          const ListTile(
+                            leading: Icon(Icons.album),
+                            title: Text('The Enchanted Nightingale'),
+                            subtitle: Text('Music by Julie Gable. Lyrics by Sidney Stein.'),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              TextButton(
+                                child: const Text('BUY TICKETS'),
+                                onPressed: () {/* ... */},
+                              ),
+                              const SizedBox(width: 8),
+                              TextButton(
+                                child: const Text('LISTEN'),
+                                onPressed: () {/* ... */},
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )),
+              );
             });
       }), // This trailing comma makes auto-formatting nicer for build methods.
     );

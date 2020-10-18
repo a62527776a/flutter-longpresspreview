@@ -107,7 +107,7 @@ class LongPressPreviewDialogPrototypeManager {
   }
 }
 
-enum LongPressPreviewAnimationKey { blurAnimation, sizeAnimation, positionAnimation, scaleAnimation, childWidgetTransferDialogWidgetAnimation }
+enum LongPressPreviewAnimationKey { blurAnimation, sizeAnimation, positionAnimation, scaleAnimation, childWidgetTransferDialogWidgetAnimation, touchAnimation }
 
 class LongPressPreviewAnimationControllerManager {
   LongPressPreviewAnimationControllerManager(TickerProvider that, {this.milliseconds, this.parametricCurve, this.screenSize}) {
@@ -163,7 +163,7 @@ class LongPressPreviewDialog extends StatefulWidget {
       this.elevation,
       this.child,
       this.screenSize,
-      this.longPressStartDetails,
+      this.globalPosition,
       this.onDragToTop,
       this.content,
       this.dialogSize,
@@ -188,7 +188,7 @@ class LongPressPreviewDialog extends StatefulWidget {
   LongPressPreviewDialogState state;
 
   // 暂存首次长按的信息
-  LongPressStartDetails longPressStartDetails;
+  Offset globalPosition;
 
   Size childWidgetSize;
   Offset childWidgetPosition;
@@ -290,10 +290,13 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
     resetPositionAnimationControllerManager.forward();
   }
 
+  bool sliderToBottomDistanceOverflow(double speed) {
+    return dialogPrototypeManager.position.dy > 0 && speed > 1000;
+  }
+
   // fingers off screen
   Future<void> onDragEnd(Velocity velocity) async {
-    print(velocity);
-    if (hasOverflowCloseThreshold) {
+    if (hasOverflowCloseThreshold || sliderToBottomDistanceOverflow(velocity.pixelsPerSecond.distance)) {
       if (widget.onFingerCallBack != null) widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_cancel, () {});
       return onDispose();
     }
@@ -319,7 +322,7 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
     Offset beginOffset = Offset(widget.childWidgetPosition.dx - screenWidth / 2 + widget.childWidgetSize.width / 2,
         widget.childWidgetPosition.dy - screenHeight / 2 + widget.childWidgetSize.height / 2);
     // childWidget transfer dialog animation need more beautiful curves 😊
-    final Animation<double> childWidgetTransferDialogAnimationCurve = outInAnimationControllerManager.buildCurve(Curves.easeOutBack);
+    final Animation<double> childWidgetTransferDialogAnimationCurve = outInAnimationControllerManager.buildCurve(Curves.easeIn);
     Offset endOffset = reverse ? Offset(dialogPrototypeManager.position.dx, dialogPrototypeManager.position.dy) : const Offset(0, 0);
     outInAnimationControllerManager.setAnimation(LongPressPreviewAnimationKey.childWidgetTransferDialogWidgetAnimation,
         begin: beginOffset,
@@ -393,7 +396,7 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
     dialogPrototypeManager = LongPressPreviewDialogPrototypeManager(maxSize: widget.dialogSize);
     initOutInAnimation();
     initResetDialogPositionAnimation();
-    fingerMoveCountManager.setLongPressStartY(widget.longPressStartDetails.globalPosition.dy);
+    fingerMoveCountManager.setLongPressStartY(widget.globalPosition.dy);
     WidgetsBinding.instance.addPostFrameCallback((Duration callback) {
       dialogInScreenAnimation();
     });
