@@ -17,6 +17,10 @@ Drag up or Drag down close dialog.
 
 https://a62527776a.github.io/flutter-longpress-preview-demo/index.html
 
+## example apk
+
+https://a62527776a.github.io/flutter-longpress-preview-demo/app-release.apk
+
 ## install
 add next line to pubspec.yaml
 ``` yaml

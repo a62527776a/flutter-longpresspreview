@@ -29,7 +29,7 @@
 .pub-cache/
 .pub/
 build/
-
+example/
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
