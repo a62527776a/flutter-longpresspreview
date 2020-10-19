@@ -135,7 +135,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
     });
   }
 
-  WillPopScope androidWillPopScope(Widget child) {
+  Widget androidWillPopScope(Widget child) {
     return Platform.isAndroid ? WillPopScope(child: child, onWillPop: onWillPop) : child;
   }
 
