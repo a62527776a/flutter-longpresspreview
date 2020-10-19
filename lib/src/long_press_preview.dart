@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
@@ -68,6 +69,14 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
     }
   }
 
+  Future<bool> onWillPop() async {
+    if (longPressPreviewDialog != null) {
+      longPressPreviewDialog.state.onDispose();
+      return false;
+    }
+    return true;
+  }
+
   // 状态重制并销毁
   void _dispose() {
     if (longPressPreviewDialog == null) return;
@@ -126,9 +135,13 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
     });
   }
 
+  WillPopScope androidWillPopScope(Widget child) {
+    return Platform.isAndroid ? WillPopScope(child: child, onWillPop: onWillPop) : child;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Listener(
+    return androidWillPopScope(Listener(
         // 首次聚焦并且手指移动的情况
         onPointerMove: (PointerMoveEvent event) {
           if (longPressPreviewDialog != null) {
@@ -150,6 +163,6 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
                 longPressPreviewDialog.onLongPressEnd(e.velocity);
               }
             },
-            child: Offstage(offstage: longPressPreviewDialog != null, child: Transform.scale(child: widget.child, scale: childWidgetScale))));
+            child: Offstage(offstage: longPressPreviewDialog != null, child: Transform.scale(child: widget.child, scale: childWidgetScale)))));
   }
 }

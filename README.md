@@ -20,7 +20,7 @@ https://a62527776a.github.io/flutter-longpress-preview-demo/index.html
 ## install
 add next line to pubspec.yaml
 ``` yaml
-long_press_preview: ^0.0.2
+long_press_preview: ^0.0.3
 ```
 
 ``` cmd
