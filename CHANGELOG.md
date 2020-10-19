@@ -1,4 +1,4 @@
-## [0.0.3] - optimization interactive
+## [0.0.4] - optimization interactive
 * Handling the Android return key
 
 ## [0.0.2] - optimization gesture
