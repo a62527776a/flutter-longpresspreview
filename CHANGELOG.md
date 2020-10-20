@@ -1,7 +1,8 @@
 ## [0.0.6] - optimization interactive
 * optimization long press response time （250 ms to 350ms
-* optimization touch animation config
+* optimization touch animation
 * [fix bug] dialog animation runing disable dragEnd event
+* [fix bug] Fix long press trigger onTap
 
 ## [0.0.5] - optimization interactive
 * Speed ​​up long press response time （500 ms to 250ms
