@@ -1,3 +1,11 @@
+## [0.0.6] - optimization interactive
+* optimization long press response time （250 ms to 350ms
+* optimization touch animation config
+* [fix bug] dialog animation runing disable dragEnd event
+
+## [0.0.5] - optimization interactive
+* Speed ​​up long press response time （500 ms to 250ms
+
 ## [0.0.4] - optimization interactive
 * Handling the Android return key
 

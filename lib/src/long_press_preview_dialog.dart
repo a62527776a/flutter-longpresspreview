@@ -296,6 +296,7 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
 
   // fingers off screen
   Future<void> onDragEnd(Velocity velocity) async {
+    if (outInAnimationControllerManager?.controller?.isAnimating ?? false) return;
     if (hasOverflowCloseThreshold || sliderToBottomDistanceOverflow(velocity.pixelsPerSecond.distance)) {
       if (widget.onFingerCallBack != null) widget.onFingerCallBack(LongPressPreviewFingerEvent.long_press_cancel, () {});
       return onDispose();

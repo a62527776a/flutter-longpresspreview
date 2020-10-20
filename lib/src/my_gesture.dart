@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:long_press_preview/src/config.dart';
 
 class LongPressPreviewGesture extends GestureDetector {
   LongPressPreviewGesture({onTapDown, onTapUp, onLongPressStart, onLongPressEnd, child})
@@ -47,7 +48,7 @@ class LongPressPreviewGesture extends GestureDetector {
           onSecondaryLongPressMoveUpdate != null ||
           onSecondaryLongPressEnd != null) {
         gestures[LongPressGestureRecognizer] = GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
-          () => LongPressGestureRecognizer(debugOwner: this, duration: Duration(milliseconds: 250)),
+          () => LongPressGestureRecognizer(debugOwner: this, duration: Duration(milliseconds: LongPressPreviewConf.longPressGestureDuration)),
           (LongPressGestureRecognizer instance) {
             instance
               ..onLongPress = onLongPress

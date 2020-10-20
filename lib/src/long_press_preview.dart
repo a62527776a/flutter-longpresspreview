@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:long_press_preview/src/config.dart';
 import 'package:long_press_preview/src/long_press_preview_dialog.dart';
 import 'package:long_press_preview/src/my_gesture.dart';
 
@@ -32,9 +33,6 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
 
   LongPressPreviewAnimationControllerManager touchAnimationController;
   double childWidgetScale = 1;
-
-  // touch animation threshold Exceeding it will start animation
-  static int touchAnimationThreshold = 50;
 
   int touchDownTime = 0;
   int touchCancelTime = 0;
@@ -88,8 +86,10 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
   }
 
   void initTouchAnimation() {
-    touchAnimationController =
-        LongPressPreviewAnimationControllerManager(this, milliseconds: 125, parametricCurve: Curves.linear, screenSize: MediaQuery.of(context).size);
+    touchAnimationController = LongPressPreviewAnimationControllerManager(this,
+        milliseconds: LongPressPreviewConf.touchAnimationDuration,
+        parametricCurve: LongPressPreviewConf.touchAnimationCurves,
+        screenSize: MediaQuery.of(context).size);
     touchAnimationController.setAnimation(LongPressPreviewAnimationKey.touchAnimation, begin: 1, end: 0.9, callBack: (val) {
       setState(() {
         childWidgetScale = val.toDouble();
@@ -130,7 +130,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
   // do noting touch with widget is too short
   Future<void> waitToAnimation() async {
     touchIn = true;
-    touchTimer = Timer(Duration(milliseconds: touchAnimationThreshold), () {
+    touchTimer = Timer(Duration(milliseconds: LongPressPreviewConf.touchAnimationThreshold), () {
       touchTimer.cancel();
       if (touchIn) startTouchAnimation();
     });
