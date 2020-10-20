@@ -135,9 +135,9 @@ class LongPressPreviewAnimationControllerManager {
     return CurvedAnimation(parent: _controller, curve: curve);
   }
 
-  void forward() {
+  Future<void> forward() async {
     if (_controller?.isCompleted ?? false) _controller.reset();
-    _controller.forward();
+    return await _controller.forward();
   }
 
   Future<void> reverse() async {
@@ -165,6 +165,7 @@ class LongPressPreviewDialog extends StatefulWidget {
       this.screenSize,
       this.globalPosition,
       this.onDragToTop,
+      this.dialogAnimationWaitForwardCallBack,
       this.content,
       this.dialogSize,
       this.onFingerCallBack,
@@ -180,6 +181,7 @@ class LongPressPreviewDialog extends StatefulWidget {
   final Widget content;
   final Function onContentTap;
   final Function onDragToTop;
+  final Function dialogAnimationWaitForwardCallBack;
   final Function onFingerCallBack;
   final Size dialogSize;
 
@@ -349,12 +351,15 @@ class LongPressPreviewDialogState extends State<LongPressPreviewDialog> with Tic
       });
   }
 
-  void dialogInScreenAnimation() {
+  Future<void> dialogInScreenAnimation() async {
     setChildWidgetMoveDialogAnimation();
-    outInAnimationControllerManager.forward();
     setState(() {
       dialogTransferFlug = !dialogTransferFlug;
     });
+    await outInAnimationControllerManager.forward();
+    if (widget.dialogAnimationWaitForwardCallBack != null) {
+      widget.dialogAnimationWaitForwardCallBack();
+    }
   }
 
   // dialog OutIn animation

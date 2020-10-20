@@ -28,6 +28,8 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
   // 长按出弹窗
   LongPressPreviewDialog longPressPreviewDialog;
 
+  bool inAnimation = false;
+
   OverlayState overlay;
   OverlayEntry oe;
 
@@ -54,6 +56,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
             screenSize: screenSize,
             dispose: _dispose,
             globalPosition: globalPosition,
+            dialogAnimationWaitForwardCallBack: dialogAnimationWaitForwardCallBack,
             content: widget.content,
             onFingerCallBack: widget.onFingerCallBack,
             dialogSize: widget.dialogSize,
@@ -106,20 +109,26 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
   }
 
   @override
+  void dialogAnimationWaitForwardCallBack() {
+    inAnimation = false;
+  }
+
+  @override
   void dispose() {
     super.dispose();
     touchAnimationController.dispose();
   }
 
   Future<void> startTouchAnimation() async {
+    inAnimation = true;
     await touchAnimationController.controller.forward();
     if (touchIn) touchAnimationController.reverse();
   }
 
   Future<void> reverseTouchAnimation(Offset globalPosition) async {
     touchIn = false;
-    if (touchAnimationController.controller.isAnimating) {
-      touchAnimationController.controller.stop();
+    if (inAnimation) {
+      touchAnimationController?.controller?.stop();
       _createLongPressPreviewDialog(globalPosition, context);
     } else {
       widget.onTap();
