@@ -114,3 +114,8 @@ long_press_drag_top | 滑到上方时回调 | Callback when slider to top
 --------------------------------------------------
 the second param is a function. when first params is LongPressPreviewFingerEven.long_press_drag_top or LongPressPreviewFingerEven.long_press_end, call the second param will uninstall dialog instance. Otherwise nothing will happen.This is used if you want to unload the pop-up window and do something else (such as jump to the next page) when you drag above or at the end of a long press
 
+
+TODO:
+* onTap的触发在touch动画执行一遍后 而不是现在的50ms后
+* 优化一下touch动画
+

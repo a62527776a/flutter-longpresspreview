@@ -1,3 +1,9 @@
+
+## [0.0.7] - optimization interactive
+* optimization touch animation
+* optimization touch gesture
+* increase interactive feedback (vibration)
+
 ## [0.0.6] - optimization interactive
 * optimization long press response time （250 ms to 350ms
 * optimization touch animation

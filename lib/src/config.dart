@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class LongPressPreviewConf {
-  static int touchAnimationDuration = 100;
-  static int longPressGestureDuration = 425;
+  static int touchAnimationDuration = 200;
   static int touchAnimationThreshold = 50;
-  static Curve touchAnimationCurves = Curves.linear;
+  static double touchScaleMin = 0.95;
+  static int longPressGestureDuration = 600;
+  static Curve touchAnimationCurves = Curves.easeInOutCubic;
 }

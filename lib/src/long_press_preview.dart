@@ -4,9 +4,12 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:long_press_preview/src/config.dart';
 import 'package:long_press_preview/src/long_press_preview_dialog.dart';
 import 'package:long_press_preview/src/my_gesture.dart';
+
+enum TouchAnimationStatus { none, forward, reverse }
 
 class LongPressPreview extends StatefulWidget {
   LongPressPreview({Key key, this.child, this.content, this.onTap, this.onFingerCallBack, this.dialogSize = const Size(300, 300)}) : super(key: key);
@@ -34,6 +37,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
   OverlayEntry oe;
 
   LongPressPreviewAnimationControllerManager touchAnimationController;
+  TouchAnimationStatus touchAnimationStatus = TouchAnimationStatus.none;
   double childWidgetScale = 1;
 
   int touchDownTime = 0;
@@ -93,7 +97,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
         milliseconds: LongPressPreviewConf.touchAnimationDuration,
         parametricCurve: LongPressPreviewConf.touchAnimationCurves,
         screenSize: MediaQuery.of(context).size);
-    touchAnimationController.setAnimation(LongPressPreviewAnimationKey.touchAnimation, begin: 1, end: 0.9, callBack: (val) {
+    touchAnimationController.setAnimation(LongPressPreviewAnimationKey.touchAnimation, begin: 1, end: LongPressPreviewConf.touchScaleMin, callBack: (val) {
       setState(() {
         childWidgetScale = val.toDouble();
       });
@@ -121,13 +125,19 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
 
   Future<void> startTouchAnimation() async {
     inAnimation = true;
+    touchAnimationStatus = TouchAnimationStatus.forward;
     await touchAnimationController.controller.forward();
-    if (touchIn) touchAnimationController.reverse();
+    if (touchIn) {
+      HapticFeedback.lightImpact();
+      touchAnimationStatus = TouchAnimationStatus.reverse;
+      await touchAnimationController.reverse();
+    }
+    touchAnimationStatus = TouchAnimationStatus.none;
   }
 
   Future<void> reverseTouchAnimation(Offset globalPosition) async {
     touchIn = false;
-    if (inAnimation) {
+    if (touchAnimationStatus == TouchAnimationStatus.reverse) {
       touchAnimationController?.controller?.stop();
       _createLongPressPreviewDialog(globalPosition, context);
     } else {
