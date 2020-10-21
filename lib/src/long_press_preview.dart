@@ -128,7 +128,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
     touchAnimationStatus = TouchAnimationStatus.forward;
     await touchAnimationController.controller.forward();
     if (touchIn) {
-      HapticFeedback.lightImpact();
+      HapticFeedback.mediumImpact();
       touchAnimationStatus = TouchAnimationStatus.reverse;
       await touchAnimationController.reverse();
     }
