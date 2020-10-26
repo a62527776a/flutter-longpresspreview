@@ -2,7 +2,7 @@ name: long_press_preview
 description: Long press and show draggable dialog of any widget. Draggable dialog and multi gesture callback provides. Drag up or Drag down close dialog.
 
 homepage: https://github.com/a62527776a
-version: 0.0.6
+version: 0.0.7
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

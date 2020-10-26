@@ -116,6 +116,8 @@ the second param is a function. when first params is LongPressPreviewFingerEven.
 
 
 TODO:
-* onTap的触发在touch动画执行一遍后 而不是现在的50ms后
-* 优化一下touch动画
+* 优化弹窗动画
+
+* ~~onTap的触发在touch动画执行一遍后 而不是现在的50ms后~~
+* ~~优化一下touch动画~~
 
