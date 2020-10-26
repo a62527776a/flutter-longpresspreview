@@ -139,6 +139,7 @@ class LongPressPreviewState extends State<LongPressPreview> with TickerProviderS
     touchIn = false;
     if (touchAnimationStatus == TouchAnimationStatus.reverse) {
       touchAnimationController?.controller?.stop();
+      touchAnimationStatus = TouchAnimationStatus.none;
       _createLongPressPreviewDialog(globalPosition, context);
     } else {
       widget.onTap();
